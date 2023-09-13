@@ -1,14 +1,35 @@
 const express = require('express');
 const cors = require('cors');
+require('dotenv').config();
 const app = express();
 // by using the pool , we can run queries with postgres
 const pool = require('./db');
+const { XMLParser, XMLBuilder, XMLValidator } = require('fast-xml-parser');
+const axios = require('axios');
+const { topics } = require('./constants');
 
 //middleware
 app.use(cors());
 app.use(express.json());
 
 //ROUTES//
+
+//get the xml data from web scraping google news ( by a topic)
+app.get('/news/:topic', async (req, res) => {
+  try {
+    const parser = new XMLParser();
+    const response = await axios({
+      method: 'get',
+      url: topics[req.params.topic].url,
+      headers: { 'Content-Type': 'application/xml' },
+    });
+    const data = parser.parse(response.data);
+    res.json(data.rss.channel.item);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 //create a todo
 app.post('/todos', async (req, res) => {
@@ -22,6 +43,7 @@ app.post('/todos', async (req, res) => {
     res.json(newTodo.rows[0]);
   } catch (err) {
     console.error(err.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 //get all todos
@@ -32,6 +54,7 @@ app.get('/todos', async (req, res) => {
     res.json(allTodos.rows);
   } catch (err) {
     console.error(err.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -46,6 +69,7 @@ app.get('/todos/:id', async (req, res) => {
     res.json(todo.rows[0]);
   } catch (error) {
     console.error(err.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -61,15 +85,22 @@ app.put('/todos/:id', async (req, res) => {
     res.json('Todo was updated!');
   } catch (err) {
     console.error(err.message);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 //delete a todo
 app.delete('/todos/:id', async (req, res) => {
-  const { id } = req.params;
-  const deletedTodo = await pool.query('DELETE FROM todo WHERE todo_id =  $1', [
-    id,
-  ]);
-  res.json('Todo was deleted!');
+  try {
+    const { id } = req.params;
+    const deletedTodo = await pool.query(
+      'DELETE FROM todo WHERE todo_id =  $1',
+      [id]
+    );
+    res.json('Todo was deleted!');
+  } catch (error) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 });
 
 app.listen(5000, () => {
