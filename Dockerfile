@@ -35,3 +35,26 @@ CMD [ "node","index.js" ]
 #  my local machine , i am going to develop in the docker container
 #  so to build the image is the command - docker build <the path to my dockerfile which is in my corrent directory so i'll write . >
 #  in short this is my command - docker build .
+# when i run this command you can see in the output - 
+# where its looks like for example - [1/5] is doing the first command out of the 5 in the dockerfile 
+#  which is taking the image node:18 out of docker hub
+#  the seconed step - [2/5] - is setting the working directory to be /app ,
+# after the first time i'll do it - i'll see cached written brcause its caches the result of every step.
+#  with the command - docker image ls - i can see the created image
+#  he saw that we didnt named the image - so he deleted the image - with the command: docker image rm < image id >
+#  and now well do the build image command with a flag to name the image:
+#  docker build -t node-app-image .
+#  to run the image / specify the image we want to create a container from
+#  -> docker run -d --name node-app node-app-image
+#  --name node-app -> flaf for naming the container
+#  dont be confused , node-app-image - is the name of the image
+#  and node-app is the name for the container
+# -d flag for running the container in detached mode ( to not be attached to the cli or the console - so my command line is still free)
+#  docker ps - to see the containers data
+
+# now i'll see that when i go back to my site its not running , this is because we are unable to connect to out docker container on localhost 3000
+# even though we wrote expose 3000 -> this live does nothing , this is more for docmentation -> for telling that this image expacts you to open up port 3000 to work.
+# so this line doesnt open the port 3000, docker containers by default can talk to the outside world but not the opposite.
+# to make the outside world can talk to our docker container(which means not just the internet but also our locallhost machine - my windows machine)
+# we need to poke a hole at my host machine -> telling to our host machine that if we recieve traffic on a specific port we want to forwared that traffic to our docker container.
+#  to kill the container -  
