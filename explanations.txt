@@ -169,6 +169,20 @@ so at the end of the bind mount we add :ro -> for read only , so the command loo
 
 docker run -v ${PWD}:/app:ro -v /app/node_modules -p 5000:5000 -d --name node-app node-app-image 
 
+// environment variables in docker container
+lets say we want our express server to listen on port 4000, remember that our express app listen on port 4000 now
+we need to change the port that were sending traffic to ( because now were sending traffic to our container at port 3000 
+- the right port number) so ill need to chage the right port also 
+to sum up the command looks like this now:
+
+docker run -v ${PWD}:/app:ro -v /app/node_modules --env PORT=4000 -p 5000:4000 -d --name node-app node-app-image
+
+but this command is fine if you have small amount of environment variables
+
+if i have many -> make an .env file and do this command instead:
+
+docker run -v ${PWD}:/app:ro -v /app/node_modules --env-file ./.env -p 5000:4000 -d --name node-app node-app-image
+
 
 
 

@@ -7,6 +7,7 @@ const pool = require('./db');
 const { XMLParser, XMLBuilder, XMLValidator } = require('fast-xml-parser');
 const axios = require('axios');
 const { topics } = require('./constants');
+const PORT = process.env.PORT;
 
 //middleware
 app.use(cors());
@@ -105,6 +106,6 @@ app.delete('/todos/:id', async (req, res) => {
   }
 });
 
-app.listen(5000, () => {
-  console.log('server has started on port 5000');
+app.listen(PORT, () => {
+  console.log(`server has started on port ${PORT}`);
 });
