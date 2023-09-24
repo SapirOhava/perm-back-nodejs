@@ -13,7 +13,9 @@ app.use(cors());
 app.use(express.json());
 
 //ROUTES//
-
+app.get('/test', async (req, res) => {
+  return res.send('<h1>sapir</h1>');
+});
 //get the xml data from web scraping google news ( by a topic)
 app.get('/news/:topic', async (req, res) => {
   try {

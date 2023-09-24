@@ -1,7 +1,10 @@
 docker build -t node-app-image .                                          ->  building image
 docker image ls                                                           -> show images
 docker image rm < image id >                                              -> delete image
-docker run -v ${PWD}:/app -p 5000:5000 -d --name node-app node-app-image  -> run the container
+docker run -v ${PWD}:/app:ro -v /app/node_modules -p 5000:5000 -d --name node-app node-app-image 
+-> run the container
 docker ps                                                                 -> to see the containers data
 docker rm node-app -f                                                     -> kill the container
 docker exec -it node-app bash                                             -> log in to my docker container - and take a look at my files in there
+docker ps -a                                                              -> show all containers (not just running)
+docker logs <container name>                                              -> show container logs

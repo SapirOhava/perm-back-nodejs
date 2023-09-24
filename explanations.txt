@@ -147,6 +147,29 @@ so why is that ? its because the bind volume sync this change ( the deleting of 
 for not doing that will use another volume 
 
 
+when i delete the nodemodules in my local environment ( local machine) -> its not suppose to effect of my 
+code , because its running in the docker environment. but because i used the bind voloume when i delete the nodemodules
+it also delete the nodemodules in the /app in the container , so what i need to de - is make sure this bind mount doesnt
+override the /app/nodemodules.
+so delete the container , and add an anonymous volume to the the run command(all volumes based of specificity)
+
+docker run -v ${PWD}:/app -v /app/node_modules -p 5000:5000 -d --name node-app node-app-image
+
+one thing to point out:
+we do a copy of all of our files into our container at the build stage ( in dockerfile )
+the bind mount is just in our developement process( because thats when were changing the code)
+when we deploy in production its not gonna be a bind mount(were not going to change the code in production)
+what it meand the run command is not going to be with the voloume !
+
+attention - the /app directory in the container is sync with our source code directory on our local machine
+and now its a 2 way street , meaning if i make changes in our /app directory in the container its going to 
+affect our source code , and that probably not what we want , so we can change our bind mount to be 
+a read only bind mount.
+so at the end of the bind mount we add :ro -> for read only , so the command looks like that :
+
+docker run -v ${PWD}:/app:ro -v /app/node_modules -p 5000:5000 -d --name node-app node-app-image 
+
+
 
 
 
