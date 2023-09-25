@@ -183,7 +183,53 @@ if i have many -> make an .env file and do this command instead:
 
 docker run -v ${PWD}:/app:ro -v /app/node_modules --env-file ./.env -p 5000:4000 -d --name node-app node-app-image
 
+when i see in the command:
 
+docker volume ls
 
+this is because in the running command - in this part (-v /app/node_modules) i create an anonymous volume ,
+so every time i delete the container its going to preserve this volume ( this node_modules folder in this case)
 
+docker volume prune
 
+to delete all the volumes that isn't associated with the running container
+the command for creating a container is very long!!! it becoming a problem when i run multiple containers 
+there is a way to automate it - feature called docker compose.
+where we can create a file that has all the steps and all the configuration settings we want for each 
+docker container.
+
+so first ill create a docker compose file,
+
+1.  Create a File: create a file named docker-compose.yml, it uses YAML syntax.
+
+2.  At the top of the file, define the version of the Docker Compose file format you're using.
+    As of my last update, version '3' was common, 
+    but always check the Docker Compose documentation for the latest version and features.
+
+3.  Define Services: Each container you want to run is defined as a service.
+
+---- spacing matters in YAML files !!! put always one tab
+first the name of the service(ours in node-app , basically can be everything i want)
+after is the build step - which image we use , we build our dockerfile in our current directory
+so we pass the path to our dockerfile.
+by the way when i use a docker compose file we can use relative paths so i don't need the variables
+
+services:
+  node-app:
+    build:
+      context: ./path-to-node-app
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+
+Notes:
+
+The build directive tells Docker Compose to build the Docker image from a Dockerfile located in the specified directory.
+The ports directive maps ports from the host to the container.
+The image directive tells Docker Compose to use a pre-built image from Docker Hub (or another registry).
+The volumes directive for MongoDB is mapping a named volume to persist data across container restarts.
+
+then do the command docker-compose up -d
+
+technically when i run docker-compose it creates a brand new network for all my services
+so it doesnt interfere with any of the other docker containers
