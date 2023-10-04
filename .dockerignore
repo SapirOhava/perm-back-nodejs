@@ -4,3 +4,4 @@ Dockerfile
 .git
 .gitignore
 explanations.txt
+docker-compose*

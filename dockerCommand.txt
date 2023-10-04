@@ -14,3 +14,6 @@ you can also delete the associated volumes with a specific container in the comm
 docker rm node-app -fv
 docker-compose up -d        ->run the docker compose file ( -d is the detached flag)
 docker-compose down -v --build ->  -v for deleting the volumes and --build to force rebuild of the image
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d   
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml down -v // -v for deleting the extra volumes
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d  --build // when we change our code in production we need to rebuild the image --build force rebuilding the image

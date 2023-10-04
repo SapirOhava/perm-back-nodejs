@@ -233,3 +233,45 @@ then do the command docker-compose up -d
 
 technically when i run docker-compose it creates a brand new network for all my services
 so it doesnt interfere with any of the other docker containers
+
+one thing to notice:
+
+i am running the command npm run dev (CMD [ "npm","run","dev"])
+so how do i go into production?
+because right now when i run docker compose everything is with respect to our development environment
+my docker compose creates that bind mount - ./:/app - which we don't want in production deployment
+( we dont need to sync anything) and also in production theres going to be
+different environment variables and ports.
+
+the easiest solution is you can create multiple docker files(one for development and one for production)
+and on top of it we can create different docker-compose files
+
+in the example he shows how to do everything as much in one file as possible
+one dockerfile and split the docker-compose file to 2 different files.
+
+so created instead 3 files - docker-compose.yml, docker-compose.prod.yml , docker-compose.dev.yml
+the docker-compose.yml going to have all the configurations that are shared between both the 
+environments( dev and prod). in an actual project were going to have ton of containers and will see that 
+a lot of the configurations for our containers are the same. 
+
+this command to run this:
+docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d 
+-f is the flag for file, the order matters , because the fields in the second file 
+override the first file , -d for detached mode.
+
+if we run our docker-compose.prod.yml file we still download the nodemon package even though its clearly 
+sets in the package.json as  "devDependencies" we are never gonna use nodemon in production,
+and thats because we run in the dockerfile npm install .
+normally in production its looks like that 
+RUN npm install --only=production // thats prevents any dev dependencies from getting installed
+so what we will do is set our dockerfile to be intelligent enough to know  whether we are in dev or
+ prod mode. ( basically we write an embedded bash script)
+
+ARG NODE_ENV
+RUN if [ "$NODE_ENV" = "development" ]; \
+      then npm install; \
+      else npm install --only=production; \
+      fi
+
+also $NODE_ENV this is an argument that gets pass into our dockerfile when its building the docker image
+ and we have to set this value in our docker-compose files
