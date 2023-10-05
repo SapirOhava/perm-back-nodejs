@@ -275,3 +275,56 @@ RUN if [ "$NODE_ENV" = "development" ]; \
 
 also $NODE_ENV this is an argument that gets pass into our dockerfile when its building the docker image
  and we have to set this value in our docker-compose files
+
+
+adding a MongoDB container:
+i added a new service ( each container is a service), it the docker-compose.yml ( the shared one)
+i didn't specified the version of the mongo image so it will download the latest one.
+i don't do build: . ( because i don't make a new custom image, in mongo we just use the regular image - 
+i don't need to customize it ) the 2 environments variables are written in the docs , that we have to set
+
+mongo:
+    image: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=...
+      - MONGO_INITDB_ROOT_PASSWORD=...
+
+when we destroys the db container all the db data goes as well - because we don't want to do than we 
+will use voloumes.
+
+    volumes:
+      - ./:/app:ro 
+      
+      the bind mount which syncs the data within the container to a folder on my local drive 
+      if i want to be able to poke around the database data on my local machine, then ill use 
+      this bind mount , but for now ill just use the mongo client .
+      
+      - /app/node_modules
+
+      i don't want to use an anonymous volume because i want to identify ( give a name to my db data )
+      so ill create a named volume( which exactly like anonymous volume but it just have a human
+      readable name  )
+
+      /data/db - you can see in the docs of the mongo official image that this is the folder
+      in the container that i'm interested in .
+
+      volumes:
+      -  /data/db - that the anonymous volume 
+
+      volumes:
+      - mongo-db:/data/db  - that a named volume
+
+  don't be confused :
+  in the bind mount - i provide a path on my local machine to a path on the container
+  in the anonymous volume  - i just provide the path to the container directory( 
+  that im interested in) 
+  and for the name voloume - i do a name : provide the path to the container directory( 
+  that im interested in) 
+  but !!! its important , to note that with named volumes i also have to declare in another portion 
+  in the docker-compose file and thats because a named volume can be used by multiple services.
+
+  so im adding it in the section volumes( see in the docker-compose file)
+  so now that we got persistance data for our database and the database container is up and running , lets set up our express application 
+  to connect to our mongo database, when it comes to interacting with our mongo db we are going to use mongoose library.(which makes it a
+   bit easier to talk to our mongo db) so ill install mongoose.
+

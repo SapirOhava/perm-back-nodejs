@@ -1,7 +1,13 @@
 const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+
 const app = express();
+mongoose
+  .connect('mongodb://root:1234@172.30.0.2:27017/?authSource=admin')
+  .then(() => console.log('successfully connected to mongo db'))
+  .catch((e) => console.log(e));
 // by using the pool , we can run queries with postgres
 const pool = require('./db');
 const { XMLParser, XMLBuilder, XMLValidator } = require('fast-xml-parser');
