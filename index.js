@@ -5,7 +5,7 @@ require('dotenv').config();
 
 const app = express();
 mongoose
-  .connect('mongodb://root:1234@172.30.0.2:27017/?authSource=admin')
+  .connect('mongodb://root:1234@mongo:27017/?authSource=admin')
   .then(() => console.log('successfully connected to mongo db'))
   .catch((e) => console.log(e));
 // by using the pool , we can run queries with postgres

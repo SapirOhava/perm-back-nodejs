@@ -326,5 +326,28 @@ will use voloumes.
   so im adding it in the section volumes( see in the docker-compose file)
   so now that we got persistance data for our database and the database container is up and running , lets set up our express application 
   to connect to our mongo database, when it comes to interacting with our mongo db we are going to use mongoose library.(which makes it a
-   bit easier to talk to our mongo db) so ill install mongoose.
+  bit easier to talk to our mongo db) so ill install mongoose.
 
+
+
+ i used docker inspect <container name > to get the ip address of our container and then put it in to our code , however 
+ if we stop and restart my container or if i do docker-compose down and then up theres no guarantee that we get the same ip 
+ address and even if we could guarantee the same exact ip address, the first time we run it we still need to get the ip address 
+ manually from docker inspect. --> so docker has a nice feature that allows us to make it easy to talk between containers.
+ and this feature only exist when it comes to custom networks that get created so if i do :
+ docker network ls 
+ well see theres a couple network that we have (we got the bridge and host network  - 2 default networks that comes with docker)
+ and another one - <the name of our app/directory and ends with default> this is the one docker compose created 
+( the custom one that was created just for our application)and when you have a custom networks not the 2 default ones - just networks that
+i create ----> we have DNS , so when one docker container wants to talk to another docker container we can use the 
+name of that container/service to talk to that container.
+
+so if we go back to our docker-compose file - i see that my service for my node app called node-app, and the service for my mongo 
+container called mongo, so i can refer to this containers ip address based of this service name. 
+so i can put the service name instead of the ip 
+example: instead of connect('mongodb://root:1234@172.30.0.2:27017/?authSource=admin')
+write this - connect('mongodb://root:1234@mongo:27017/?authSource=admin')
+
+to see how it works :
+lets log  in to the node app container - docker exec -it perm-back-nodejs-node-app-1 bash - 
+we can ping mongo - ping mongo

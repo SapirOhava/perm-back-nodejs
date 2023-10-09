@@ -19,4 +19,5 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml down -v // -v for
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d  --build // when we change our code in production we need to rebuild the image --build force rebuilding the image
 docker volume prune
 docker volume ls
-docker inspect <docker name>
+docker inspect <docker name> // here you can see the ip of the container and more
+docker logs <container name> // do this to see the console log that i connected to the mongo db
