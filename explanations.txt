@@ -351,3 +351,8 @@ write this - connect('mongodb://root:1234@mongo:27017/?authSource=admin')
 to see how it works :
 lets log  in to the node app container - docker exec -it perm-back-nodejs-node-app-1 bash - 
 we can ping mongo - ping mongo
+
+one thing that is problem in my app is that the the url is hard coded in the app,instead i want this url
+stored in an environment variable. so in our base directory ill create a new folder - config -
+and in her ill create a file named config.js - which will store a variable that stores all our 
+environment variables.
