@@ -11,10 +11,17 @@ const {
 
 const app = express();
 const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`;
-mongoose
-  .connect(mongoUrl)
-  .then(() => console.log('successfully connected to mongo db'))
-  .catch((e) => console.log(e));
+
+const connectWithRetry = () => {
+  mongoose
+    .connect(mongoUrl)
+    .then(() => console.log('successfully connected to mongo db'))
+    .catch((e) => {
+      console.log(e);
+      setTimeout(connectWithRetry, 5000); //call again after 5 seconds to retry to connect
+    });
+};
+connectWithRetry();
 // by using the pool , we can run queries with postgres
 const pool = require('./db');
 const { XMLParser, XMLBuilder, XMLValidator } = require('fast-xml-parser');

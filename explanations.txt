@@ -356,3 +356,46 @@ one thing that is problem in my app is that the the url is hard coded in the app
 stored in an environment variable. so in our base directory ill create a new folder - config -
 and in her ill create a file named config.js - which will store a variable that stores all our 
 environment variables.
+
+now when it comes to starting up our docker container especially using docker-compose we can run into some potential issues
+when we spin our node and mongo containers , we don't actually know the exact order they will get spun up on.
+and that could lead to issues because if our node container spins up first its going to run this code - mongoose
+  .connect(mongoUrl)
+  .then(() => console.log('successfully connected to mongo db'))
+  .catch((e) => console.log(e)); ... to try to connect to our database, and that would throw an error and crash the app.
+
+  so for ordering - docker-compose has depends_on field.
+  ill do it in the docker-compose.yml file because its both in dev and prod( this ordering)
+  thats why i added this - 
+      depends_on:
+      - mongo
+
+now when we down and then up again - we see that 
+ ✔ Network perm-back-nodejs_default       Created                                                                            0.1s 
+ ✔ Container perm-back-nodejs-mongo-1     Started                                                                            0.1s 
+ ✔ Container perm-back-nodejs-node-app-1  Started  
+
+ which shows that the mongo container started first , and after it the node container.
+
+ but !!!! this still doesn't fix our issue , because the only thing docker does it spins up mongo first .
+ it has no idea whether if mongo fully initialized etc.. it doesn't do any checks to verify our mongo
+ db is up and listening for connections. --> but docker cant really do something about it , 
+ and you shouldn't rely on docker or your orchestrator to handle that , instead you want to implement 
+ some sort of logic in the app to handle this scenario  where my mongo db isn't up and running before 
+ my app starts . usually that involves to keep retrying to connect until you able to successfully connect
+ to it. now mongoose in this case will actually try for 30 seconds automatically for me, after 30 seconds
+the app will crash.( but for 30 seconds it will keep trying and trying to connect) 
+- that is actually what we want , but ill add to my index.js this function for example what you can do 
+for retrying  to connect - TO MAKE SURE TO UNDERSTAND THAT I NEED TO IMPLEMENT SOME SORT OF LOGIC IN 
+MY APP TO ENSURE TO HANDLE THIS SCENARIO BECAUSE ORCHESTRATOR , DOCKER AND DOCKER-COMPOSE CANT TRULY 
+GUARANTEE THAT MY DB IS FULLY UP AND RUNNING, BEFORE MY APP STARTS.
+- this example is not the best practice or the best way to handle this 
+  const connectWithRetry = () => {
+  mongoose
+    .connect(mongoUrl)
+    .then(() => console.log('successfully connected to mongo db'))
+    .catch((e) => {
+      console.log(e);
+      setTimeout(connectWithRetry, 5000); //call again after 5 seconds to retry to connect
+    });
+};
