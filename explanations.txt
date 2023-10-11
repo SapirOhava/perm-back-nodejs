@@ -399,3 +399,10 @@ GUARANTEE THAT MY DB IS FULLY UP AND RUNNING, BEFORE MY APP STARTS.
       setTimeout(connectWithRetry, 5000); //call again after 5 seconds to retry to connect
     });
 };
+
+
+now , i want to start to implement  a user sign up and login functionality( the reason he does this is 
+he want to introduce one more container - a redis container ) we gonna use redis for authentication.
+---- in the user model - i changed from username to email !!!
+
+obviously we don't want to save the password as a plain text, so i'll install a new library - bcrypt - to hash the password
