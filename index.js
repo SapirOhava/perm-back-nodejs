@@ -2,12 +2,25 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
+const session = require('express-session');
+const redis = require('redis');
+let RedisStore = require('connect-redis')(session);
+const PORT = process.env.PORT;
+
 const {
   MONGO_USER,
   MONGO_PASSWORD,
   MONGO_IP,
   MONGO_PORT,
+  REDIS_URL,
+  REDIS_PORT,
 } = require('./config/config');
+// in here i have to pass the host url( ip address) and the port that redis server is going
+// to be listening on ( i wrote them in config.js) remember i have the dns in docker( "redis" -> ip)
+let redisClient = redis.createClient({
+  host: REDIS_URL,
+  port: REDIS_PORT,
+});
 
 const postRouter = require('./routes/postRoutes');
 const todoRouter = require('./routes/todoRoutes');
@@ -29,9 +42,22 @@ connectWithRetry();
 const { XMLParser, XMLBuilder, XMLValidator } = require('fast-xml-parser');
 const axios = require('axios');
 const { topics } = require('./constants');
-const PORT = process.env.PORT;
 
 //middleware
+app.use(
+  session({
+    store: new RedisStore({ client: redisClient }),
+    secret: '123', // the session secret is random string we store on our express server we use to handle the sessions
+    cookie: {
+      // the properties for the cookie we send back to the user(its in the express-session docs)
+      secure: false,
+      resave: false,
+      saveUninitializes: false,
+      httpOnly: true, // httpOnly is about restricting access to cookies from client-side scripts.
+      maxAge: 30000,
+    },
+  })
+);
 app.use(cors());
 app.use(express.json());
 

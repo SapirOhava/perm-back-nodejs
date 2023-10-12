@@ -406,3 +406,32 @@ he want to introduce one more container - a redis container ) we gonna use redis
 ---- in the user model - i changed from username to email !!!
 
 obviously we don't want to save the password as a plain text, so i'll install a new library - bcrypt - to hash the password
+
+now that we got user sign up and login working, now we want to handle the authentication side of things.
+when the user logs in, how do we actually store that state in our application - we use sessions for that.
+so now we will implement authentication , because now a user can sign up and login but we need to make it possible for a user to create 
+and modify posts only if user is authenticated.
+so im going to use  express-session
+theres 2 ways to handle - authentication
+1. using json web tokens // that i did in the rest api project
+2. using sessions  
+
+i use sessions because i want to use redis db( to store our sessions)
+// i can see in the docs of express-sessions in npm , how to work with redis ( down in the bottom under session store implementation
+/ compatible session stores) and there ( just look for redis ) is with connect-redis.
+before this i'll get a redis db. so in docker hub search redis. and i'll add the official image of redis(which is the first result).
+so ill add a redis service in the docker-compose.yml file ( because its both for dev and prod)
+
+i did 
+npm install redis connect-redis express-session
+and now basically we need to do docker-compose down and docker-compose up with --build because we did
+install new dependencies, so we have rebuild our node image. however what we can do is just do 
+a docker-compose up -d --build -V
+
+ -V / --renew-anon-volumes  - when i have my containers already up and running and then i do another up and 
+i want to rebuild the image whats going to happen is that the already running container for our node app
+is going to grab the old anonymous volumes , and the old anonymous volumes has all of our old
+dependencies and packages, but we installed new one like redis , so we need to force docker to renew anonymous
+volumes, instead of the old ones we need a new ones( one of the volumes in node_modules and that one doesn't include the new dependencies)
+, we can do this the regular way which is docker-compose down and then up with the -- build , or we can do just the up again like this 
+a docker-compose up -d --build -V
