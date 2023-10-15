@@ -21,3 +21,6 @@ docker volume prune
 docker volume ls
 docker inspect <docker name> // here you can see the ip of the container and more
 docker logs <container name> // do this to see the console log that i connected to the mongo db
+docker exec -it <redis container name> redis-cli
+KEYS * //get all our redis entries
+GET <id of cookie> // get the details of that session

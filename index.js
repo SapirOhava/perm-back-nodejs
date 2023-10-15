@@ -2,11 +2,19 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
-const session = require('express-session');
-const { createClient } = require('redis');
-const RedisStore = require('connect-redis').default;
-const PORT = process.env.PORT;
+const { XMLParser, XMLBuilder, XMLValidator } = require('fast-xml-parser');
+const axios = require('axios');
+const { topics } = require('./constants');
+const postRouter = require('./routes/postRoutes');
+const todoRouter = require('./routes/todoRoutes');
+const userRouter = require('./routes/userRoutes');
 
+/////////////////////////
+const session = require('express-session');
+const redis = require('redis');
+let RedisStore = require('connect-redis').default;
+
+const PORT = process.env.PORT;
 const {
   MONGO_USER,
   MONGO_PASSWORD,
@@ -14,18 +22,18 @@ const {
   MONGO_PORT,
   REDIS_URL,
   REDIS_PORT,
+  SESSION_SECRET,
 } = require('./config/config');
 // in here i have to pass the host url( ip address) and the port that redis server is going
 // to be listening on ( i wrote them in config.js) remember i have the dns in docker( "redis" -> ip)
-let redisClient = createClient({
-  host: REDIS_URL,
-  port: REDIS_PORT,
+////////////////////////
+const redisClient = redis.createClient({
+  url: 'redis://redis:6379',
 });
-redisClient.connect().catch(console.error);
 
-const postRouter = require('./routes/postRoutes');
-const todoRouter = require('./routes/todoRoutes');
-const userRouter = require('./routes/userRoutes');
+redisClient.connect().catch(console.error);
+let store = new RedisStore({ client: redisClient, prefix: 'perm-back:' });
+/////////////////////
 
 const app = express();
 const mongoUrl = `mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_IP}:${MONGO_PORT}/?authSource=admin`;
@@ -40,21 +48,19 @@ const connectWithRetry = () => {
     });
 };
 connectWithRetry();
-const { XMLParser, XMLBuilder, XMLValidator } = require('fast-xml-parser');
-const axios = require('axios');
-const { topics } = require('./constants');
 
 //middleware
 app.use(
   session({
-    store: new RedisStore({ client: redisClient, prefix: 'myapp:' }),
-    secret: '123', // the session secret is random string we store on our express server we use to handle the sessions
-    // the properties for the cookie we send back to the user(its in the express-session docs)
-    secure: false,
-    resave: false,
-    saveUninitialized: false,
-    httpOnly: true, // httpOnly is about restricting access to cookies from client-side scripts.
-    maxAge: 30000,
+    store: store,
+    secret: SESSION_SECRET,
+    cookie: {
+      saveUninitialized: false,
+      resave: false,
+      secure: false, // Set true if using https
+      httpOnly: true,
+      maxAge: 300000, // Set cookie max age
+    },
   })
 );
 app.use(cors());

@@ -435,3 +435,10 @@ dependencies and packages, but we installed new one like redis , so we need to f
 volumes, instead of the old ones we need a new ones( one of the volumes in node_modules and that one doesn't include the new dependencies)
 , we can do this the regular way which is docker-compose down and then up with the -- build , or we can do just the up again like this 
 a docker-compose up -d --build -V
+
+i can add any information to the session i created , what now i want to do is when the user logs in i want to
+store the user information within this session. and then if we have a user information in that session i know 
+hes logged in. the nice part about doing this i can store any information i wan to store in the session 
+even a data that needs to be private about a user because the user will never see that session , its just in 
+my redis db. its never sent out to the browser and the user.
+so to do this in the authController under the login function
