@@ -11,6 +11,7 @@ exports.signUp = async (req, res) => {
       email,
       password: hashedPassword,
     });
+    req.session.user = newUser;
     res.status(201).json({
       status: 'User created successfully',
       data: {
@@ -37,7 +38,7 @@ exports.login = async (req, res) => {
     // checking that the password is correct
     const isCorrect = await bcrypt.compare(password, user.password);
     if (isCorrect) {
-      //req.session.user = user; // that is how i access the session object thats will be attached to the req obj
+      req.session.user = user; // that is how i access the session object thats will be attached to the req obj
       res.status(200).json({
         status: 'signup successfully',
       });

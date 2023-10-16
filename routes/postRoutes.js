@@ -1,17 +1,18 @@
 const express = require('express');
 
 const postController = require('../controllers/postController');
+const protect = require('../middleware/authMiddleware');
 const router = express.Router();
 
 router
   .route('/')
-  .get(postController.getAllPosts)
-  .post(postController.createPost);
+  .get(protect, postController.getAllPosts)
+  .post(protect, postController.createPost); // when the user wants to create a post were run first the protect middleware
 
 router
   .route('/:id')
-  .get(postController.getPost)
-  .patch(postController.updatePost)
-  .delete(postController.deletePost);
+  .get(protect, postController.getPost)
+  .patch(protect, postController.updatePost)
+  .delete(protect, postController.deletePost);
 
 module.exports = router;

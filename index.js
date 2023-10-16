@@ -59,7 +59,7 @@ app.use(
       resave: false,
       secure: false, // Set true if using https
       httpOnly: true,
-      maxAge: 300000, // Set cookie max age
+      maxAge: 6000000, // Set cookie max age ( this is in milliseconds)
     },
   })
 );
