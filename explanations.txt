@@ -1,4 +1,4 @@
-the first command that we always need to do is to specify the base image or a known image
+the first command that i always need to do is to specify the base image or a known image
 (image that docker has access to - is on docker hub) the base image is the official node image.
 because really thats the only thing that i need to run , and anything else is needed to run node
 i got my specific node version -> with node -v command
@@ -32,7 +32,7 @@ expose the port my app listen to (port 3000)
 
 EXPOSE 3000
 
-when we start the container - tell it which command to run
+when i start the container - tell it which command to run
 since my app is a node app and the entry point is index.js file
 so the command it need to run is node index.js
 
@@ -56,16 +56,16 @@ with the command:
 
 docker image ls 
 
-- i can see the created image. he saw that we didnt named the image - 
+- i can see the created image. he saw that i didnt named the image - 
 so he deleted the image - with the command: 
 
 docker image rm < image id >
 
-and now well do the build image command with a flag to name the image:
+and now ill do the build image command with a flag to name the image:
 
 docker build -t node-app-image .
 
-to run the image / specify the image we want to create a container from:
+to run the image / specify the image i want to create a container from:
 
 docker run -d --name node-app node-app-image
 
@@ -77,12 +77,12 @@ docker ps
  
 - to see the containers data
 
-now i'll see that when i go back to my site its not running , this is because we are unable to connect to out docker container
-on localhost 3000, even though we wrote expose 3000 -> this live does nothing , this is more for documentation -> 
+now i'll see that when i go back to my site its not running , this is because i are unable to connect to out docker container
+on localhost 3000, even though i wrote expose 3000 -> this live does nothing , this is more for documentation -> 
 for telling that this image expacts you to open up port 3000 to work.
 so this line doesnt open the port 3000, docker containers by default can talk to the outside world but not the opposite.
 to make the outside world can talk to our docker container(which means not just the internet but also our locallhost machine - my windows machine)
-we need to poke a hole at my host machine -> telling to our host machine that if we receive traffic on a specific port we want to forward that traffic to our docker container.
+i need to poke a hole at my host machine -> telling to our host machine that if i receive traffic on a specific port i want to forward that traffic to our docker container.
 to kill the container:
 
 docker rm node-app -f  
@@ -93,7 +93,7 @@ the correct command is ->
 docker run -p 3000:3000 -d --name node-app node-app-image
 
 
-the right 3000 is the port that were going to send traffic to our container(which is the port that our container expects to get traffic on- which what i set in the express listen app port)
+the right 3000 is the port that ire going to send traffic to our container(which is the port that our container expects to get traffic on- which what i set in the express listen app port)
 the left 3000 is the port my local machine gets traffic from the outside world
 
 when i log in to my docker container - and take a look at my files in there - with the command:
@@ -103,46 +103,46 @@ docker exec -it node-app bash
 -it , for interactive mode.
 bash - is a command to take a look at file system of our container
 by default its going to drop us in  the slash app directory 
-when i insert ls command -> i will see all the files in that  directory - and will see that dockerfile and nodemodules are in this container - which we don't need 
-the dockerfile is there to create an image but we don't need it in our docker container  also node modules is very large and we don't need it were doing npm install already , ( that install all the files in the package.json file)
+when i insert ls command -> i will see all the files in that  directory - and will see that dockerfile and nodemodules are in this container - which i don't need 
+the dockerfile is there to create an image but i don't need it in our docker container  also node modules is very large and i don't need it ire doing npm install already , ( that install all the files in the package.json file)
 its because the command COPY . ./ -> that copies all the files in our current directory into the image.
-also there gonna be more files we don't want like .env etc.. so we need to create a dockerignore file .
+also there gonna be more files i don't want like .env etc.. so i need to create a dockerignore file .
 
 now the nodemodules that in the container is from the command npm install and not from the copy command.
 
-when ill change the code - and save when ill refresh the page , it wont be updated - this because we need to rebuild the - 
-we build an image and made a container out of it , now that we change our code - but the original image didn't changed -> and so our container didnt changed
-so to update it - we need to delete the container ( by force) and then build again the image. and run the container out of the image.
--> we don't want to do that every time we change the code -> we are going to use volumes. -> which allows us to have a persistence data in our containers
+when ill change the code - and save when ill refresh the page , it wont be updated - this because i need to rebuild the - 
+i build an image and made a container out of it , now that i change our code - but the original image didn't changed -> and so our container didnt changed
+so to update it - i need to delete the container ( by force) and then build again the image. and run the container out of the image.
+-> i don't want to do that every time i change the code -> i are going to use volumes. -> which allows us to have a persistence data in our containers
 theres a specific volume called a bind mount in docker  -> allows us to sync a folder(or a file system) 
 in our local host machine to a folder in our docker container. that takes all the files and sync them into the /app directory 
 of our container so i don't need to always rebuild the image when there is changes.
 for that will delete the container, and theres no need to rebuild the image , the image is fine.
 
-we going to update the run command of the container : 
+i going to update the run command of the container : 
 docker run -v <copy the path to the folder with the source code on my local machine>:<the folder in our docker container> -p 3000:3000 -d --name node-app node-app-image 
 
-to make it shorter were going to use variables - its going to be different based of my operating system.
+to make it shorter ire going to use variables - its going to be different based of my operating system.
 in windows cmd :
 %cd% - current directory - that way i don't need to copy the entire path ( remember you can't use the . )
 so the full command now is :
 
 docker run -v %cd%:/app -p 3000:3000 -d --name node-app node-app-image 
-we still need to do another step - remember in express or node app every time we change the code - we need to restart the node process.
-we will install nodemon as a dev dependency. just on the local machine (npm install nodemon --save-dev)
- because we dont need it in production ,
+i still need to do another step - remember in express or node app every time i change the code - i need to restart the node process.
+i will install nodemon as a dev dependency. just on the local machine (npm install nodemon --save-dev)
+ because i dont need it in production ,
  and also add this 2 scripts in package.json:
    "start": "node index.js",
    "dev": "nodemon index.js",
 
 if theres any problems in windows with nodemon not actually restarting ( i may need to pass the -L flag)
 so :   "dev": "nodemon -L index.js",
-and also in dockerfile now we need to change the command for running the container from 
+and also in dockerfile now i need to change the command for running the container from 
 CMD [ "node","index.js" ] -> CMD [ "npm","run","dev"]
 
-so now that we have changed the package.json file -> i need to rebuild the image now
+so now that i have changed the package.json file -> i need to rebuild the image now
 
-important !!! when ill delete the local nodemodules -> the container crashes ! even thoug we are not running our code in our locall developement 
+important !!! when ill delete the local nodemodules -> the container crashes ! even thoug i are not running our code in our locall developement 
 so why is that ? its because the bind volume sync this change ( the deleting of nodemodules with out container directory )
 for not doing that will use another volume 
 
@@ -156,22 +156,22 @@ so delete the container , and add an anonymous volume to the the run command(all
 docker run -v ${PWD}:/app -v /app/node_modules -p 5000:5000 -d --name node-app node-app-image
 
 one thing to point out:
-we do a copy of all of our files into our container at the build stage ( in dockerfile )
-the bind mount is just in our developement process( because thats when were changing the code)
-when we deploy in production its not gonna be a bind mount(were not going to change the code in production)
+i do a copy of all of our files into our container at the build stage ( in dockerfile )
+the bind mount is just in our developement process( because thats when ire changing the code)
+when i deploy in production its not gonna be a bind mount(ire not going to change the code in production)
 what it meand the run command is not going to be with the voloume !
 
 attention - the /app directory in the container is sync with our source code directory on our local machine
 and now its a 2 way street , meaning if i make changes in our /app directory in the container its going to 
-affect our source code , and that probably not what we want , so we can change our bind mount to be 
+affect our source code , and that probably not what i want , so i can change our bind mount to be 
 a read only bind mount.
-so at the end of the bind mount we add :ro -> for read only , so the command looks like that :
+so at the end of the bind mount i add :ro -> for read only , so the command looks like that :
 
 docker run -v ${PWD}:/app:ro -v /app/node_modules -p 5000:5000 -d --name node-app node-app-image 
 
 // environment variables in docker container
-lets say we want our express server to listen on port 4000, remember that our express app listen on port 4000 now
-we need to change the port that were sending traffic to ( because now were sending traffic to our container at port 3000 
+lets say i want our express server to listen on port 4000, remember that our express app listen on port 4000 now
+i need to change the port that ire sending traffic to ( because now ire sending traffic to our container at port 3000 
 - the right port number) so ill need to chage the right port also 
 to sum up the command looks like this now:
 
@@ -195,7 +195,7 @@ docker volume prune
 to delete all the volumes that isn't associated with the running container
 the command for creating a container is very long!!! it becoming a problem when i run multiple containers 
 there is a way to automate it - feature called docker compose.
-where we can create a file that has all the steps and all the configuration settings we want for each 
+where i can create a file that has all the steps and all the configuration settings i want for each 
 docker container.
 
 so first ill create a docker compose file,
@@ -210,9 +210,9 @@ so first ill create a docker compose file,
 
 ---- spacing matters in YAML files !!! put always one tab
 first the name of the service(ours in node-app , basically can be everything i want)
-after is the build step - which image we use , we build our dockerfile in our current directory
-so we pass the path to our dockerfile.
-by the way when i use a docker compose file we can use relative paths so i don't need the variables
+after is the build step - which image i use , i build our dockerfile in our current directory
+so i pass the path to our dockerfile.
+by the way when i use a docker compose file i can use relative paths so i don't need the variables
 
 services:
   node-app:
@@ -239,19 +239,19 @@ one thing to notice:
 i am running the command npm run dev (CMD [ "npm","run","dev"])
 so how do i go into production?
 because right now when i run docker compose everything is with respect to our development environment
-my docker compose creates that bind mount - ./:/app - which we don't want in production deployment
-( we dont need to sync anything) and also in production theres going to be
+my docker compose creates that bind mount - ./:/app - which i don't want in production deployment
+( i dont need to sync anything) and also in production theres going to be
 different environment variables and ports.
 
 the easiest solution is you can create multiple docker files(one for development and one for production)
-and on top of it we can create different docker-compose files
+and on top of it i can create different docker-compose files
 
 in the example he shows how to do everything as much in one file as possible
 one dockerfile and split the docker-compose file to 2 different files.
 
 so created instead 3 files - docker-compose.yml, docker-compose.prod.yml , docker-compose.dev.yml
-the docker-compose.yml going to have all the configurations that are shared between both the 
-environments( dev and prod). in an actual project were going to have ton of containers and will see that 
+the docker-compose.yml going to have all the configurations that are shared betien both the 
+environments( dev and prod). in an actual project ire going to have ton of containers and will see that 
 a lot of the configurations for our containers are the same. 
 
 this command to run this:
@@ -259,13 +259,13 @@ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 -f is the flag for file, the order matters , because the fields in the second file 
 override the first file , -d for detached mode.
 
-if we run our docker-compose.prod.yml file we still download the nodemon package even though its clearly 
-sets in the package.json as  "devDependencies" we are never gonna use nodemon in production,
-and thats because we run in the dockerfile npm install .
+if i run our docker-compose.prod.yml file i still download the nodemon package even though its clearly 
+sets in the package.json as  "devDependencies" i are never gonna use nodemon in production,
+and thats because i run in the dockerfile npm install .
 normally in production its looks like that 
 RUN npm install --only=production // thats prevents any dev dependencies from getting installed
-so what we will do is set our dockerfile to be intelligent enough to know  whether we are in dev or
- prod mode. ( basically we write an embedded bash script)
+so what i will do is set our dockerfile to be intelligent enough to know  whether i are in dev or
+ prod mode. ( basically i write an embedded bash script)
 
 ARG NODE_ENV
 RUN if [ "$NODE_ENV" = "development" ]; \
@@ -274,14 +274,14 @@ RUN if [ "$NODE_ENV" = "development" ]; \
       fi
 
 also $NODE_ENV this is an argument that gets pass into our dockerfile when its building the docker image
- and we have to set this value in our docker-compose files
+ and i have to set this value in our docker-compose files
 
 
 adding a MongoDB container:
 i added a new service ( each container is a service), it the docker-compose.yml ( the shared one)
 i didn't specified the version of the mongo image so it will download the latest one.
-i don't do build: . ( because i don't make a new custom image, in mongo we just use the regular image - 
-i don't need to customize it ) the 2 environments variables are written in the docs , that we have to set
+i don't do build: . ( because i don't make a new custom image, in mongo i just use the regular image - 
+i don't need to customize it ) the 2 environments variables are written in the docs , that i have to set
 
 mongo:
     image: mongo
@@ -289,7 +289,7 @@ mongo:
       - MONGO_INITDB_ROOT_USERNAME=...
       - MONGO_INITDB_ROOT_PASSWORD=...
 
-when we destroys the db container all the db data goes as well - because we don't want to do than we 
+when i destroys the db container all the db data goes as ill - because i don't want to do than i 
 will use voloumes.
 
     volumes:
@@ -324,25 +324,25 @@ will use voloumes.
   in the docker-compose file and thats because a named volume can be used by multiple services.
 
   so im adding it in the section volumes( see in the docker-compose file)
-  so now that we got persistance data for our database and the database container is up and running , lets set up our express application 
-  to connect to our mongo database, when it comes to interacting with our mongo db we are going to use mongoose library.(which makes it a
+  so now that i got persistance data for our database and the database container is up and running , lets set up our express application 
+  to connect to our mongo database, when it comes to interacting with our mongo db i are going to use mongoose library.(which makes it a
   bit easier to talk to our mongo db) so ill install mongoose.
 
 
 
- i used docker inspect <container name > to get the ip address of our container and then put it in to our code , however 
- if we stop and restart my container or if i do docker-compose down and then up theres no guarantee that we get the same ip 
- address and even if we could guarantee the same exact ip address, the first time we run it we still need to get the ip address 
- manually from docker inspect. --> so docker has a nice feature that allows us to make it easy to talk between containers.
+ i used docker inspect <container name > to get the ip address of our container and then put it in to our code , hoiver 
+ if i stop and restart my container or if i do docker-compose down and then up theres no guarantee that i get the same ip 
+ address and even if i could guarantee the same exact ip address, the first time i run it i still need to get the ip address 
+ manually from docker inspect. --> so docker has a nice feature that allows us to make it easy to talk betien containers.
  and this feature only exist when it comes to custom networks that get created so if i do :
  docker network ls 
- well see theres a couple network that we have (we got the bridge and host network  - 2 default networks that comes with docker)
+ ill see theres a couple network that i have (i got the bridge and host network  - 2 default networks that comes with docker)
  and another one - <the name of our app/directory and ends with default> this is the one docker compose created 
 ( the custom one that was created just for our application)and when you have a custom networks not the 2 default ones - just networks that
-i create ----> we have DNS , so when one docker container wants to talk to another docker container we can use the 
+i create ----> i have DNS , so when one docker container wants to talk to another docker container i can use the 
 name of that container/service to talk to that container.
 
-so if we go back to our docker-compose file - i see that my service for my node app called node-app, and the service for my mongo 
+so if i go back to our docker-compose file - i see that my service for my node app called node-app, and the service for my mongo 
 container called mongo, so i can refer to this containers ip address based of this service name. 
 so i can put the service name instead of the ip 
 example: instead of connect('mongodb://root:1234@172.30.0.2:27017/?authSource=admin')
@@ -350,15 +350,15 @@ write this - connect('mongodb://root:1234@mongo:27017/?authSource=admin')
 
 to see how it works :
 lets log  in to the node app container - docker exec -it perm-back-nodejs-node-app-1 bash - 
-we can ping mongo - ping mongo
+i can ping mongo - ping mongo
 
 one thing that is problem in my app is that the the url is hard coded in the app,instead i want this url
 stored in an environment variable. so in our base directory ill create a new folder - config -
 and in her ill create a file named config.js - which will store a variable that stores all our 
 environment variables.
 
-now when it comes to starting up our docker container especially using docker-compose we can run into some potential issues
-when we spin our node and mongo containers , we don't actually know the exact order they will get spun up on.
+now when it comes to starting up our docker container especially using docker-compose i can run into some potential issues
+when i spin our node and mongo containers , i don't actually know the exact order they will get spun up on.
 and that could lead to issues because if our node container spins up first its going to run this code - mongoose
   .connect(mongoUrl)
   .then(() => console.log('successfully connected to mongo db'))
@@ -370,7 +370,7 @@ and that could lead to issues because if our node container spins up first its g
       depends_on:
       - mongo
 
-now when we down and then up again - we see that 
+now when i down and then up again - i see that 
  ✔ Network perm-back-nodejs_default       Created                                                                            0.1s 
  ✔ Container perm-back-nodejs-mongo-1     Started                                                                            0.1s 
  ✔ Container perm-back-nodejs-node-app-1  Started  
@@ -385,7 +385,7 @@ now when we down and then up again - we see that
  my app starts . usually that involves to keep retrying to connect until you able to successfully connect
  to it. now mongoose in this case will actually try for 30 seconds automatically for me, after 30 seconds
 the app will crash.( but for 30 seconds it will keep trying and trying to connect) 
-- that is actually what we want , but ill add to my index.js this function for example what you can do 
+- that is actually what i want , but ill add to my index.js this function for example what you can do 
 for retrying  to connect - TO MAKE SURE TO UNDERSTAND THAT I NEED TO IMPLEMENT SOME SORT OF LOGIC IN 
 MY APP TO ENSURE TO HANDLE THIS SCENARIO BECAUSE ORCHESTRATOR , DOCKER AND DOCKER-COMPOSE CANT TRULY 
 GUARANTEE THAT MY DB IS FULLY UP AND RUNNING, BEFORE MY APP STARTS.
@@ -402,18 +402,18 @@ GUARANTEE THAT MY DB IS FULLY UP AND RUNNING, BEFORE MY APP STARTS.
 
 
 now , i want to start to implement  a user sign up and login functionality( the reason he does this is 
-he want to introduce one more container - a redis container ) we gonna use redis for authentication.
+he want to introduce one more container - a redis container ) i gonna use redis for authentication.
 ---- in the user model - i changed from username to email !!!
 
-obviously we don't want to save the password as a plain text, so i'll install a new library - bcrypt - to hash the password
+obviously i don't want to save the password as a plain text, so i'll install a new library - bcrypt - to hash the password
 
-now that we got user sign up and login working, now we want to handle the authentication side of things.
-when the user logs in, how do we actually store that state in our application - we use sessions for that.
-so now we will implement authentication , because now a user can sign up and login but we need to make it possible for a user to create 
+now that i got user sign up and login working, now i want to handle the authentication side of things.
+when the user logs in, how do i actually store that state in our application - i use sessions for that.
+so now i will implement authentication , because now a user can sign up and login but i need to make it possible for a user to create 
 and modify posts only if user is authenticated.
 so im going to use  express-session
 theres 2 ways to handle - authentication
-1. using json web tokens // that i did in the rest api project
+1. using json ib tokens // that i did in the rest api project
 2. using sessions  
 
 i use sessions because i want to use redis db( to store our sessions)
@@ -424,21 +424,54 @@ so ill add a redis service in the docker-compose.yml file ( because its both for
 
 i did 
 npm install redis connect-redis express-session
-and now basically we need to do docker-compose down and docker-compose up with --build because we did
-install new dependencies, so we have rebuild our node image. however what we can do is just do 
+and now basically i need to do docker-compose down and docker-compose up with --build because i did
+install new dependencies, so i have rebuild our node image. hoiver what i can do is just do 
 a docker-compose up -d --build -V
 
  -V / --renew-anon-volumes  - when i have my containers already up and running and then i do another up and 
 i want to rebuild the image whats going to happen is that the already running container for our node app
 is going to grab the old anonymous volumes , and the old anonymous volumes has all of our old
-dependencies and packages, but we installed new one like redis , so we need to force docker to renew anonymous
-volumes, instead of the old ones we need a new ones( one of the volumes in node_modules and that one doesn't include the new dependencies)
-, we can do this the regular way which is docker-compose down and then up with the -- build , or we can do just the up again like this 
+dependencies and packages, but i installed new one like redis , so i need to force docker to renew anonymous
+volumes, instead of the old ones i need a new ones( one of the volumes in node_modules and that one doesn't include the new dependencies)
+, i can do this the regular way which is docker-compose down and then up with the -- build , or i can do just the up again like this 
 a docker-compose up -d --build -V
 
 i can add any information to the session i created , what now i want to do is when the user logs in i want to
-store the user information within this session. and then if we have a user information in that session i know 
+store the user information within this session. and then if i have a user information in that session i know 
 hes logged in. the nice part about doing this i can store any information i wan to store in the session 
 even a data that needs to be private about a user because the user will never see that session , its just in 
 my redis db. its never sent out to the browser and the user.
 so to do this in the authController under the login function
+
+application architecture:
+theres an img - appArchiteture.png 
+the big blue box represents my host machine (my windows machine )
+the node/express is my express application, that is listening on port 3000 and then i got 
+my mongo database, that my express app can talk to on port 27017, and if i need to 
+send a request to my express app then i just send a request to port 3000 on my 
+local machine and it will get mapped to port 3000 of my express application.
+i never opened up a port to my mongo db, just like i opened up a port 3000 to my express
+server, so that the outside world can talk to it i didn't did this to my mongo db.
+that is a security mechanism( because i don't want the outside world to talk to it, only my
+express app) docker by default if i don't open up any ports it isolates the mongo container.
+so just by running with docker i've already added a little bit of security to my application because now
+only my express app and my containers within that network that docker-compose makes can talk to that mongo db
+and no one else can.
+
+scaling up my node containers so we would spin up another node express container which also connect to my mongo db
+using the same exact port and to be able to talk to this container, i will need to publish a different port, so the first node
+container has port 3000 on my local machine and it will be mapped to port 3000 on the express app , so another container will 
+need another port like 3001 on my local machine and it will be mapped to port 3000 ( attention its the same port but its on a different
+express app so its ok ) that is not a scalable solution, my frontend shouldn't have to be aware  of the number node containers
+that im running on my backend, so what i'll do is add a load balancer(ill do it with nginx its a good skill to have because ill be 
+using nginx in other scenarios outside of docker as well its a great web server)so ultimately the final architecture will look like 
+is like in the appArchiteture.png - i'll have an nginx container that will be the entrance to my application so im no longer going to 
+publish any ports on my 2 node express servers!( so im no longer open the ports 3000 and 3001 on my local machine for this servers)
+instead ill publish one port to my nginx container - that port can be anything but in production ill use port 80, because that is 
+the default port for http , and 443 for https.
+so im gonna open port 5000 in my local machine and ill map it to port 80 which is the default port that nginx listen on .
+and then nginx container going to act as a load balancer, so every request its receive its going to load balance it across all my 
+node instances.
+
+im going to use the official nginx image on docker hub and also open a new folder(nginx) for my nginx configuration, with one file
+(default.conf) with basic configuration for my nginx server.
