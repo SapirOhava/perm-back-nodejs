@@ -48,7 +48,7 @@ const connectWithRetry = () => {
     });
 };
 connectWithRetry();
-
+app.enable('trust proxy');
 //middleware
 app.use(
   session({
@@ -75,7 +75,8 @@ app.use('/api/v1/users', userRouter);
 
 //ROUTES//
 app.get('/api/v1/test', async (req, res) => {
-  return res.send('<h1>sapir love yoel</h1>');
+  res.send('<h1>sapir love yoel</h1>');
+  console.log('gggggggggggggggggggggggggggg');
 });
 
 //get the xml data from web scraping google news ( by a topic)

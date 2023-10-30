@@ -475,3 +475,38 @@ node instances.
 
 im going to use the official nginx image on docker hub and also open a new folder(nginx) for my nginx configuration, with one file
 (default.conf) with basic configuration for my nginx server.
+
+i added this service on my docker-compose.yml file - 
+nginx:
+    image: nginx:stable-alpine
+  
+and also, now i am no longer have to publish ports for my node application. so ill remove this part, in the node-app service -
+ ports:
+    - '5000:4000'
+
+the next thing i have to do is to get my configuration file into my nginx container:
+theres a couple things i can do -
+1. i can create my own custom nginx image thats already has my configuration built in
+2. i can configure a volume specifically a bind mount and just have it sync those 2 files
+
+he chooses the second option,
+so in docker-compose.yml , ive added:
+  volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro ( the ro is for read only, it should never have to change the configuration  )
+nginx look for the config in /etc/nginx/conf.d/default.conf file
+and im syncing this with ./nginx/default.conf
+
+i need to add another extra configuration into my express application whenever my app is sitting behind a proxy, its more needed in the 
+production environment, the configuration is app.set("trust proxy") - search in google express behind proxy( its in the express js docs)
+all this is saying im going to trust some of the headers that my nginx proxy is going to be adding onto the request.( like the origin senders ip address)
+- to sum up thats why i added - app.enable("trust proxy"), in the index.js. - its really just in case i want to use the senders ip address
+if in the future ill do some rate limiting. 
+
+the last thing is i want to scale up the application - i want to add a second node instance .
+so ill do this command ( after docker-compose down )
+
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d  --scale node-app=2 
+// this part - --scale node-app=2  is how you scale services , now we have 2 node-app instances
+
+
+
